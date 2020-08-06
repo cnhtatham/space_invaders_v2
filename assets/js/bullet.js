@@ -35,3 +35,28 @@ class Bullet {
     }
 }
 
+class InvaderBullet {
+    constructor() {
+        this.xpos;
+        this.ypos;
+        this.active = false;
+        this.image = invaderbullet1_sprite
+        this.width = invaderBulletWidth;
+        this.height = invaderBulletHeight;
+    }
+
+    moveDown() {
+        if (this.ypos <= canvasHeight) {
+            this.ypos += invaderBulletSpeed;
+        } else {
+            this.active = false;
+        }
+    }
+
+    show() {
+        if (this.active) {
+            image(this.image, this.xpos, this.ypos, this.width, this.height);
+            this.moveDown()
+        }
+    }
+}

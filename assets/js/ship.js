@@ -39,4 +39,9 @@ class Ship {
         if (this.topRight <= canvasWidth)
         this.xpos += playerSpeed
     }
+
+    kill () {
+        this.xpos = playerStartX;
+        invaderBullet.active = false;
+    }
 }

@@ -8,6 +8,7 @@ class Invaders {
         this.matrix;
         this.images = invader_sprites;
         this.rows = [];
+        this.aliveRows = [];
         this._leftMostInvader = 0
         this._rightMostInvader = invaderRowLength;
         this.createRows();
@@ -47,7 +48,7 @@ class Invaders {
 
     getLeftMostInvader() {
         let l = [];
-        for (let i = 0; i < invaderRowCount; i++) {
+        for (let i = 0; i < this.rows.length; i++) {
             l.push(this.rows[i].getLeftMostInvader());
         }
         this.leftMostInvader = Math.min(...l);
@@ -55,7 +56,7 @@ class Invaders {
 
     getRightMostInvader() {
         let r = [];
-        for (let i = invaderRowCount - 1; i >= 0; i--) {
+        for (let i = this.rows.length - 1; i >= 0; i--) {
             r.push(this.rows[i].getRightMostInvader());
         }
         this.rightMostInvader = Math.max(...r);
@@ -81,21 +82,32 @@ class Invaders {
                 this.direction = 'right'
             }
         }
-        for (let i = 0; i < invaderRowCount; i++) {
+        for (let i = 0; i < this.rows.length; i++) {
             this.rows[i].moveInvaders(this.direction)
         }
     }
 
     kill(row, column) {
-        this.rows[row].row[column].alive = false;
+        this.rows[row].kill(column)
+        if (!this.rows[row].anyAlive) {
+            this.rows.splice(row, 1)
+        }
     }
 
+    pickInvadertoShoot() {
+        if (!invaderBullet.active) {
+            random(this.rows).pickInvadertoShoot()
+        }
+    }
 
     show() {
         for (let i = 0; i < this.rows.length; i++) {
             this.rows[i].show()
         }
         this.moveInvaders();
+        if (!invaderBullet.active) {
+            this.pickInvadertoShoot()
+        }
     }
 }
 
@@ -105,7 +117,13 @@ class InvaderRow {
         this.xpos = startingXpos;
         this.ypos = startingYpos;
         this.row = [];
+        this.alive = [];
         this.createRow();
+    }
+
+
+    get anyAlive() {
+        return this.alive.length
     }
 
     createRow() {
@@ -117,6 +135,7 @@ class InvaderRow {
                     this.ypos
                 )
             )
+            this.alive.push(j)
         }
     }
 
@@ -133,7 +152,7 @@ class InvaderRow {
                 return j
             }
         }
-        return this.row.length
+        return this.row.length;
     }
 
     getRightMostInvader() {
@@ -144,6 +163,20 @@ class InvaderRow {
             }
         }
         return 0
+    }
+
+    kill(column) {
+        this.row[column].alive = false;
+        for (var i = 0; i < this.alive.length; i++) {
+            if (this.alive[i] === column) {
+                this.alive.splice(i, 1);
+            }
+        }
+
+    }
+
+    pickInvadertoShoot() {
+        this.row[random(this.alive)].shoot()
     }
 
     show() {
@@ -168,6 +201,10 @@ class Invader {
         return this.xpos + this.width;
     }
 
+    get shootXpos() {
+        return this.xpos + (this.width / 2) - (invaderBullet.width / 2)
+    }
+
     moveInvader(direction) {
 
         if (direction !== this.currentDirection) {
@@ -181,6 +218,14 @@ class Invader {
         } else {
             this.xpos -= invaderSpeed;
         }
+    }
+
+    shoot() {
+        console.log('SHOOTING')
+        invaderBullet.active = true;
+        invaderBullet.xpos = this.shootXpos;
+        invaderBullet.ypos = this.ypos + this.height;
+
     }
 
     show() {

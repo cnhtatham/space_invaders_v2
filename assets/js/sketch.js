@@ -4,19 +4,27 @@ let invader1_sprite;
 let invader2_sprite;
 let invader3_sprite;
 let invader_sprites;
+let invaderbullet1_sprite
 let player;
 let bullet;
 let invaders;
+let invaderBullet;
 
 
 // General Config Options
 let playerSpeed = 5;
 let playerWidth = 100;
 let playerHeight = 100;
+let playerStartX = 450;
+let playerStarty = 650;
 
 let bulletSpeed = 8;
 let bulletWidth = 20;
 let bulletHeight = 100;
+
+let invaderBulletSpeed = 7;
+let invaderBulletWidth = 10;
+let invaderBulletHeight = 10;
 
 let invaderSpeed = 3;
 let invaderWidth = 50;
@@ -36,6 +44,7 @@ function preload() {
   invader1_sprite = loadImage('assets/images/invader1.png');
   invader2_sprite = loadImage('assets/images/invader2.png');
   invader3_sprite = loadImage('assets/images/invader3.png');
+  invaderbullet1_sprite = loadImage('assets/images/invaderbullet1.png');
   invader_sprites = [invader1_sprite, invader2_sprite, invader3_sprite]
 }
 
@@ -44,6 +53,7 @@ function setup() {
   player = new Ship(playerWidth, playerHeight);
   bullet = new Bullet();
   invaders = new Invaders();
+  invaderBullet = new InvaderBullet();
 }
 
 
@@ -52,6 +62,7 @@ function draw() {
   player.show();
   bullet.show();
   invaders.show();
+  invaderBullet.show()
   detectCollisions();
 }
 
@@ -67,7 +78,7 @@ function bulletInvaderCollision() {
   if (!bullet.active) {
     return;
   }
-  for (let i = 0; i < invaderRowCount; i++) {
+  for (let i = 0; i < invaders.rows.length; i++) {
     for (let j = 0; j < invaderRowLength; j++) {
       inv = invaders.rows[i].row[j]
       if (!inv.alive) {
@@ -83,14 +94,31 @@ function bulletInvaderCollision() {
           inv.width,
           inv.height,
         )) {
-          invaders.kill(i,j)
-          bullet.reset()
+          invaders.kill(i,j);
+          bullet.reset();
+          break;
       }
     }
+  }
+}
+
+function invaderBulletShipCollision() {
+  if (collideRectRect(
+    invaderBullet.xpos,
+    invaderBullet.ypos,
+    invaderBullet.width,
+    invaderBullet.height,
+    player.xpos,
+    player.ypos,
+    player.width,
+    player.height
+  )) {
+    player.kill();
   }
 }
 
 
 function detectCollisions() {
   bulletInvaderCollision()
+  invaderBulletShipCollision()
 }
