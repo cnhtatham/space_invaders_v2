@@ -1,7 +1,7 @@
 class Invaders {
     constructor() {
-        this.xpos = 30;
-        this.ypos = 30;
+        this.xpos = invaderStartingXpos;
+        this.ypos = invaderStartingYpos;
         this.direction = 'right';
         this.width = invaderWidth;
         this.height = invaderHeight;
@@ -32,6 +32,17 @@ class Invaders {
 
     get rightMostInvader() {
         return this._rightMostInvader
+    }
+
+    reset() {
+        this.rows = [];
+        this.aliveRows = [];
+        this._leftMostInvader = 0
+        this._rightMostInvader = invaderRowLength;
+        this.direction = 'right';
+        this.xpos = invaderStartingXpos;
+        this.ypos = invaderStartingYpos;
+        this.createRows();
     }
 
     createRows() {

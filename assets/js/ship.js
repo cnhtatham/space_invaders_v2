@@ -4,6 +4,7 @@ class Ship {
         this.width = width;
         this.xpos = 450;
         this.ypos = 650;
+        this.lives = 3;
     }
 
     get topRight() {
@@ -42,6 +43,10 @@ class Ship {
 
     kill () {
         this.xpos = playerStartX;
+        this.lives -= 1
         invaderBullet.active = false;
+        if (this.lives <= 0) {
+            gameState = 'game-over'
+        }
     }
 }
